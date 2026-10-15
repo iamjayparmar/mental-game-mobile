@@ -1,0 +1,11 @@
+{
+  "name": "Mental Game Journal",
+  "short_name": "Mental Game",
+  "description": "A private trading mental performance journal",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0B0C0F",
+  "theme_color": "#0B0C0F",
+  "orientation": "portrait",
+  "icons": [{"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}

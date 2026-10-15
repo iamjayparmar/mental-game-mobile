@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0B0C0F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>Mental Game — Trading Mind System</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0B0C0F;
+    --bg2: #111318;
+    --bg3: #181B22;
+    --surface: #1E2230;
+    --surface2: #252A3A;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #E8E6E0;
+    --muted: #7A7F94;
+    --accent: #C8A96E;
+    --accent2: #8B6FE8;
+    --red: #E05C5C;
+    --amber: #E09050;
+    --green: #5CC49A;
+    --blue: #5B8FE8;
+    --font-display: 'DM Serif Display', Georgia, serif;
+    --font-body: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --r: 12px;
+    --r-sm: 8px;
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(11,12,15,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-brand { font-family: var(--font-display); font-size: 18px; color: var(--accent); letter-spacing: .01em; }
+  .nav-links { display: flex; gap: 4px; }
+  .nav-links button {
+    background: none; border: none; color: var(--muted); font-family: var(--font-body);
+    font-size: 13px; padding: 6px 12px; border-radius: 6px; cursor: pointer;
+    transition: color .2s, background .2s;
+  }
+  .nav-links button:hover, .nav-links button.active { color: var(--text); background: var(--surface); }
+
+  /* ── SECTIONS ── */
+  section { display: none; padding: 80px 0 60px; min-height: 100vh; }
+  section.active { display: block; }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+  .container-wide { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+  /* ── HERO ── */
+  #home .hero {
+    min-height: calc(100vh - 56px);
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center; padding: 40px 24px;
+    position: relative; overflow: hidden;
+  }
+  .hero-glow {
+    position: absolute; top: 30%; left: 50%; transform: translate(-50%,-50%);
+    width: 600px; height: 400px;
+    background: radial-gradient(ellipse, rgba(200,169,110,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .18em;
+    color: var(--accent); text-transform: uppercase; margin-bottom: 20px;
+  }
+  .hero-title {
+    font-family: var(--font-display); font-size: clamp(36px, 7vw, 72px);
+    line-height: 1.1; color: var(--text); margin-bottom: 8px;
+    letter-spacing: -.01em;
+  }
+  .hero-title em { color: var(--accent); font-style: italic; }
+  .hero-sub {
+    font-size: 17px; color: var(--muted); max-width: 520px;
+    margin: 20px auto 40px; line-height: 1.7;
+  }
+  .hero-cta {
+    display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+  }
+  .btn-primary {
+    background: var(--accent); color: #1A1200; font-weight: 600; font-size: 14px;
+    border: none; padding: 12px 28px; border-radius: var(--r-sm);
+    cursor: pointer; transition: opacity .2s, transform .15s;
+    font-family: var(--font-body);
+  }
+  .btn-primary:hover { opacity: .9; transform: translateY(-1px); }
+  .btn-ghost {
+    background: transparent; color: var(--text); font-size: 14px;
+    border: 1px solid var(--border2); padding: 12px 28px; border-radius: var(--r-sm);
+    cursor: pointer; transition: background .2s, transform .15s;
+    font-family: var(--font-body);
+  }
+  .btn-ghost:hover { background: var(--surface); transform: translateY(-1px); }
+
+  .hero-stats {
+    display: flex; gap: 40px; margin-top: 60px; justify-content: center; flex-wrap: wrap;
+  }
+  .stat { text-align: center; }
+  .stat-num { font-family: var(--font-display); font-size: 36px; color: var(--accent); }
+  .stat-label { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* ── SECTION HEADINGS ── */
+  .sec-eyebrow {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .14em;
+    color: var(--accent); text-transform: uppercase; margin-bottom: 10px;
+  }
+  .sec-title { font-family: var(--font-display); font-size: clamp(26px, 4vw, 38px); line-height: 1.2; margin-bottom: 8px; }
+  .sec-desc { color: var(--muted); font-size: 15px; max-width: 560px; line-height: 1.7; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r); padding: 24px;
+    transition: border-color .2s, transform .2s;
+  }
+  .card:hover { border-color: var(--border2); transform: translateY(-2px); }
+
+  /* ── SYSTEM SECTION ── */
+  .steps-grid { display: grid; grid-template-columns: 1fr; gap: 2px; margin-top: 40px; }
+  .step-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--r); padding: 28px 32px;
+    display: flex; gap: 24px; align-items: flex-start;
+    transition: border-color .2s;
+    cursor: pointer;
+  }
+  .step-card:hover { border-color: var(--accent); }
+  .step-card.active-step { border-color: var(--accent); background: var(--surface); }
+  .step-number {
+    font-family: var(--font-display); font-size: 48px; color: var(--accent);
+    opacity: .25; line-height: 1; flex-shrink: 0; width: 50px;
+    transition: opacity .2s;
+  }
+  .step-card:hover .step-number, .step-card.active-step .step-number { opacity: 1; }
+  .step-content h3 { font-size: 18px; font-weight: 500; margin-bottom: 8px; }
+  .step-content p { color: var(--muted); font-size: 14px; line-height: 1.7; }
+  .step-content .step-detail {
+    margin-top: 14px; color: var(--muted); font-size: 13px; line-height: 1.7;
+    border-left: 2px solid var(--accent); padding-left: 14px;
+    display: none;
+  }
+  .step-card.active-step .step-detail { display: block; }
+
+  /* ── EMOTIONS SECTION ── */
+  .emo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 40px; }
+  .emo-card {
+    background: var(--bg2); border-radius: var(--r); padding: 24px;
+    border: 1px solid var(--border); cursor: pointer;
+    transition: all .25s;
+  }
+  .emo-card:hover { transform: translateY(-3px); }
+  .emo-icon { font-size: 28px; margin-bottom: 12px; }
+  .emo-card h3 { font-size: 16px; font-weight: 500; margin-bottom: 6px; }
+  .emo-card .emo-short { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .emo-card .emo-long {
+    margin-top: 14px; font-size: 13px; line-height: 1.7;
+    border-top: 1px solid var(--border); padding-top: 14px;
+    display: none;
+  }
+  .emo-card.expanded .emo-long { display: block; }
+  .emo-tag {
+    display: inline-block; font-size: 11px; padding: 3px 9px;
+    border-radius: 20px; margin-top: 10px; margin-right: 4px; margin-bottom: 2px;
+    font-family: var(--font-mono);
+  }
+
+  /* ── PERFORMANCE GAME ── */
+  .game-container { margin-top: 40px; }
+  .game-meter {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--r); padding: 32px; margin-bottom: 24px;
+  }
+  .meter-label { font-size: 13px; color: var(--muted); margin-bottom: 10px; font-family: var(--font-mono); letter-spacing: .05em; }
+  .meter-bar {
+    height: 10px; background: var(--surface);
+    border-radius: 5px; overflow: hidden; margin-bottom: 6px;
+  }
+  .meter-fill { height: 100%; border-radius: 5px; transition: width 1s cubic-bezier(.4,0,.2,1); }
+  .meter-value { font-size: 13px; color: var(--muted); text-align: right; }
+
+  .game-tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 24px; }
+  .tier {
+    border-radius: var(--r); padding: 20px; border: 1px solid;
+    transition: transform .2s;
+  }
+  .tier:hover { transform: translateY(-2px); }
+  .tier-a { background: rgba(92,196,154,0.08); border-color: rgba(92,196,154,0.3); }
+  .tier-b { background: rgba(224,144,80,0.08); border-color: rgba(224,144,80,0.3); }
+  .tier-c { background: rgba(224,92,92,0.08); border-color: rgba(224,92,92,0.3); }
+  .tier-label { font-size: 20px; font-family: var(--font-display); margin-bottom: 8px; }
+  .tier-a .tier-label { color: var(--green); }
+  .tier-b .tier-label { color: var(--amber); }
+  .tier-c .tier-label { color: var(--red); }
+  .tier-name { font-size: 13px; font-weight: 500; margin-bottom: 8px; }
+  .tier-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+  /* ── JOURNAL ── */
+  .journal-form { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r); padding: 28px; margin-bottom: 24px; }
+  .form-row { margin-bottom: 20px; }
+  .form-row label { display: block; font-size: 12px; color: var(--muted); font-family: var(--font-mono); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; }
+  .form-row select, .form-row textarea, .form-row input {
+    width: 100%; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r-sm); color: var(--text); font-family: var(--font-body);
+    font-size: 14px; padding: 10px 14px; outline: none;
+    transition: border-color .2s;
+  }
+  .form-row select:focus, .form-row textarea:focus, .form-row input:focus { border-color: var(--accent); }
+  .form-row textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+  .intensity-row { display: flex; gap: 8px; margin-top: 8px; }
+  .int-btn {
+    flex: 1; background: var(--surface); border: 1px solid var(--border);
+    color: var(--muted); font-size: 13px; padding: 8px; border-radius: var(--r-sm);
+    cursor: pointer; transition: all .2s; font-family: var(--font-body);
+  }
+  .int-btn:hover { border-color: var(--border2); color: var(--text); }
+  .int-btn.selected { background: var(--accent); color: #1A1200; border-color: var(--accent); font-weight: 600; }
+
+  .journal-entries { display: flex; flex-direction: column; gap: 12px; }
+  .entry-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--r); padding: 18px 20px;
+    animation: fadeIn .3s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .entry-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .entry-emotion { font-size: 13px; font-weight: 500; }
+  .entry-time { font-size: 11px; color: var(--muted); font-family: var(--font-mono); }
+  .entry-note { font-size: 13px; color: var(--muted); line-height: 1.65; }
+  .entry-intensity { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-top: 8px; font-family: var(--font-mono); }
+
+  /* ── BRAIN TOOLS ── */
+  .tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 40px; }
+  .tool-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--r); padding: 24px; cursor: pointer;
+    transition: all .25s;
+  }
+  .tool-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .tool-icon { font-size: 32px; margin-bottom: 14px; }
+  .tool-card h3 { font-size: 15px; font-weight: 500; margin-bottom: 6px; }
+  .tool-card p { font-size: 13px; color: var(--muted); line-height: 1.65; }
+  .tool-badge { display: inline-block; font-size: 11px; padding: 3px 8px; border-radius: 10px; margin-top: 10px; background: rgba(200,169,110,0.12); color: var(--accent); font-family: var(--font-mono); }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px); z-index: 200;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px; opacity: 0; pointer-events: none; transition: opacity .25s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: auto; }
+  .modal {
+    background: var(--bg2); border: 1px solid var(--border2);
+    border-radius: 16px; padding: 36px; max-width: 560px; width: 100%;
+    max-height: 80vh; overflow-y: auto;
+    transform: translateY(20px); transition: transform .3s;
+  }
+  .modal-overlay.open .modal { transform: translateY(0); }
+  .modal h2 { font-family: var(--font-display); font-size: 26px; margin-bottom: 6px; }
+  .modal-close {
+    position: absolute; top: 16px; right: 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 6px; color: var(--muted);
+    font-size: 16px; padding: 4px 10px; cursor: pointer; z-index: 10;
+  }
+
+  /* ── BREATHING ── */
+  .breath-container { text-align: center; padding: 40px 0; }
+  .breath-circle {
+    width: 160px; height: 160px; border-radius: 50%;
+    border: 2px solid var(--accent);
+    margin: 0 auto 24px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-size: 18px; color: var(--accent);
+    transition: transform 4s ease-in-out, opacity .5s;
+    position: relative;
+  }
+  .breath-ring {
+    position: absolute; inset: -8px; border-radius: 50%;
+    border: 1px solid rgba(200,169,110,0.2);
+    animation: pulse-ring 4s ease-in-out infinite;
+  }
+  @keyframes pulse-ring { 0%,100%{transform:scale(1);opacity:.5} 50%{transform:scale(1.15);opacity:0} }
+  .breath-label { font-size: 28px; font-family: var(--font-display); color: var(--accent); margin-bottom: 8px; }
+  .breath-phase { font-size: 14px; color: var(--muted); margin-bottom: 24px; }
+  .breath-btn {
+    background: var(--accent); color: #1A1200; border: none; padding: 12px 32px;
+    border-radius: var(--r-sm); font-size: 14px; font-weight: 600; cursor: pointer;
+    font-family: var(--font-body); transition: opacity .2s;
+  }
+  .breath-btn:hover { opacity: .9; }
+
+  /* ── REFRAME TOOL ── */
+  .reframe-input-area {
+    background: var(--surface); border: 1px solid var(--border2);
+    border-radius: var(--r); padding: 20px; margin-bottom: 16px;
+  }
+  .reframe-result {
+    background: rgba(200,169,110,0.06); border: 1px solid rgba(200,169,110,0.2);
+    border-radius: var(--r); padding: 20px; margin-top: 16px; display: none;
+  }
+  .reframe-result.show { display: block; animation: fadeIn .4s; }
+
+  /* ── STREAK ── */
+  .streak-grid { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+  .streak-day {
+    width: 28px; height: 28px; border-radius: 4px;
+    background: var(--surface); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: var(--muted); font-family: var(--font-mono);
+    cursor: pointer; transition: all .2s;
+  }
+  .streak-day.logged { background: rgba(200,169,110,0.2); border-color: var(--accent); color: var(--accent); }
+  .streak-day:hover { border-color: var(--accent); }
+
+  /* ── PROGRESS ── */
+  .progress-section { margin-top: 40px; }
+  .progress-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 28px; }
+  .p-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--r); padding: 20px;
+  }
+  .p-card-num { font-family: var(--font-display); font-size: 32px; margin-bottom: 4px; }
+  .p-card-label { font-size: 12px; color: var(--muted); }
+  .chart-area { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r); padding: 24px; }
+  .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 120px; margin-top: 16px; }
+  .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; }
+  .bar { width: 100%; border-radius: 4px 4px 0 0; transition: height .8s cubic-bezier(.4,0,.2,1), background .3s; min-height: 4px; }
+  .bar-lbl { font-size: 10px; color: var(--muted); font-family: var(--font-mono); }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center; padding: 40px 24px;
+    font-size: 12px; color: var(--muted);
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── UTILITIES ── */
+  .divider { height: 1px; background: var(--border); margin: 48px 0; }
+  .tag {
+    display: inline-block; font-size: 11px; padding: 3px 9px; border-radius: 20px;
+    font-family: var(--font-mono); margin-right: 4px;
+  }
+  .tag-red { background: rgba(224,92,92,0.15); color: var(--red); }
+  .tag-amber { background: rgba(224,144,80,0.15); color: var(--amber); }
+  .tag-green { background: rgba(92,196,154,0.15); color: var(--green); }
+  .tag-blue { background: rgba(91,143,232,0.15); color: var(--blue); }
+  .tag-purple { background: rgba(139,111,232,0.15); color: var(--accent2); }
+  .tag-gold { background: rgba(200,169,110,0.15); color: var(--accent); }
+
+  @media (max-width: 640px) {
+    .game-tiers { grid-template-columns: 1fr; }
+    .hero-stats { gap: 24px; }
+    nav { padding: 0 12px; }
+    .nav-links button { padding: 6px 8px; font-size: 12px; }
+  }
+  /* Mobile app shell */
+  @media (max-width: 640px) {
+    body { padding-bottom: 68px; }
+    nav { height: 54px; padding: 0 14px; }
+    .nav-brand { font-size: 17px; }
+    .nav-links { position: fixed; z-index: 100; inset: auto 0 0; height: 64px; padding: 5px 4px calc(5px + env(safe-area-inset-bottom));
+      background: rgba(17,19,24,.97); border-top: 1px solid var(--border); overflow-x: auto; gap: 2px; justify-content: space-around; }
+    .nav-links button { flex: 1 0 auto; font-size: 10px; padding: 8px 7px; min-width: 52px; }
+    section { padding: 72px 0 28px; }
+    .container,.container-wide { padding: 0 16px; }
+    .hero-title { font-size: clamp(40px, 12vw, 58px); }
+    .hero-sub { font-size: 15px; }
+    .hero-stats { gap: 20px; margin-top: 38px; }
+    .stat-num { font-size: 29px; }
+    .card,.game-meter,.journal-form { padding: 18px; }
+    .step-card { padding: 20px 18px; gap: 14px; }
+    .step-number { width: 34px; font-size: 40px; }
+    .intensity-row { flex-wrap: wrap; }
+    .int-btn { min-width: calc(50% - 4px); }
+    .journal-form > div:first-child { grid-template-columns: 1fr !important; gap: 14px !important; }
+    #cvr-grid,#signal-grid { grid-template-columns: 1fr !important; }
+    .modal { padding: 28px 20px; max-height: 88vh; }
+  }
+  .auth-screen { position:fixed; inset:0; z-index:500; display:flex; align-items:center; justify-content:center; padding:20px; background:radial-gradient(ellipse at 50% 35%,rgba(200,169,110,.09),transparent 55%),var(--bg); }
+  .auth-card { width:min(100%,420px); padding:30px; border:1px solid var(--border2); border-radius:16px; background:var(--bg2); }
+  .auth-card h1 { font:32px var(--font-display); margin:0 0 8px; }
+  .auth-card p { color:var(--muted); font-size:14px; margin-bottom:22px; }
+  .auth-card input { width:100%; background:var(--surface); border:1px solid var(--border2); border-radius:8px; color:var(--text); padding:13px 14px; font:15px var(--font-body); margin-bottom:12px; }
+  .auth-card button { width:100%; }
+  #auth-status { min-height:24px; margin-top:12px; font-size:13px; color:var(--accent); }
+  #account-controls { display:flex; align-items:center; gap:8px; }
+  #account-email { max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--muted); font-size:11px; }
+  #logout-btn { background:none;border:1px solid var(--border2);color:var(--muted);border-radius:6px;padding:5px 8px;font-size:11px; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">Mental Game</div>
+  <div id="account-controls" style="display:none"><span id="account-email"></span><button id="logout-btn" onclick="signOut()">Log out</button></div>
+  <div class="nav-links">
+    <button id="nav-home"     class="active" onclick="showSection('home',this)">Home</button>
+    <button id="nav-system"   onclick="showSection('system',this)">System</button>
+    <button id="nav-emotions" onclick="showSection('emotions',this)">Emotions</button>
+    <button id="nav-game"     onclick="showSection('game',this)">A/B/C Game</button>
+    <button id="nav-journal"  onclick="showSection('journal',this)">Journal</button>
+    <button id="nav-tools"    onclick="showSection('tools',this)">Brain Tools</button>
+  </div>
+</nav>
+
+<div class="auth-screen" id="auth-screen">
+  <div class="auth-card">
+    <div class="nav-brand" style="margin-bottom:18px">Mental Game</div>
+    <h1>Your practice, saved</h1>
+    <p>Sign in with your email to keep your journal private and synced across devices. We’ll email you a one-time sign-in link.</p>
+    <form onsubmit="requestSignIn(event)">
+      <input id="auth-email" type="email" autocomplete="email" placeholder="you@example.com" required>
+      <button class="btn-primary" type="submit">Continue with email</button>
+    </form>
+    <div id="auth-status" role="status"></div>
+  </div>
+</div>
+
+<!-- ══════════ HOME ══════════ -->
+<section id="home" class="active">
+  <div class="hero">
+    <div class="hero-glow"></div>
+    <p class="hero-eyebrow">Jared Tendler · Mental Game System</p>
+    <h1 class="hero-title">The <em>mind</em> is<br>your edge</h1>
+    <p class="hero-sub">Emotions aren't the problem — they're signals. This app helps you map them, find the root flaw, and resolve it permanently.</p>
+    <div class="hero-cta">
+      <button class="btn-primary" onclick="navTo('journal')">Start your journal</button>
+      <button class="btn-ghost" onclick="navTo('system')">Learn the system</button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num" id="streak-num">0</div><div class="stat-label">day streak</div></div>
+      <div class="stat"><div class="stat-num" id="entry-num">0</div><div class="stat-label">entries logged</div></div>
+      <div class="stat"><div class="stat-num" id="resolve-num">0</div><div class="stat-label">flaws resolved</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SYSTEM ══════════ -->
+<section id="system">
+  <div class="container">
+    <p class="sec-eyebrow">The framework</p>
+    <h2 class="sec-title">A system, not a silver bullet</h2>
+    <p class="sec-desc">Three stages, each building on the last. Work through them in sequence — don't skip to corrections before you've mapped the pattern.</p>
+
+    <div class="steps-grid" id="steps-grid">
+      <!-- Steps rendered by JS -->
+    </div>
+
+    <div class="divider"></div>
+
+    <p class="sec-eyebrow">Core principle</p>
+    <h2 class="sec-title">Control vs Resolution</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:28px;" id="cvr-grid">
+      <div class="card" style="border-left:3px solid var(--red);">
+        <div style="font-size:13px;font-weight:500;color:var(--red);margin-bottom:10px;">❌ Control (temporary)</div>
+        <p style="font-size:13px;color:var(--muted);line-height:1.7;">Constant effort to suppress emotions. Like dumping buckets from a leaky ceiling — it never fixes the leak. Mental energy drained daily. Upside capped by training wheels.</p>
+      </div>
+      <div class="card" style="border-left:3px solid var(--green);">
+        <div style="font-size:13px;font-weight:500;color:var(--green);margin-bottom:10px;">✓ Resolution (permanent)</div>
+        <p style="font-size:13px;color:var(--muted);line-height:1.7;">Correct the underlying flaw and the emotion stops triggering entirely. No management needed. Free to focus completely on execution — the emotion is simply gone.</p>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <p class="sec-eyebrow">The signal model</p>
+    <h2 class="sec-title">Emotion as data</h2>
+    <p class="sec-desc" style="margin-bottom:28px;">Just as you read chart signals to find trade setups, emotions are signals of hidden performance flaws.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;" id="signal-grid">
+      <div class="card" style="text-align:center;">
+        <div style="font-size:32px;margin-bottom:12px;">⚡</div>
+        <div style="font-size:13px;font-weight:500;margin-bottom:6px;">Trigger</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6;">A loss, a miss, a stop-out. Instant reflex — no conscious thought involved.</div>
+      </div>
+      <div class="card" style="text-align:center;border-color:rgba(200,169,110,0.3);">
+        <div style="font-size:32px;margin-bottom:12px;">📡</div>
+        <div style="font-size:13px;font-weight:500;margin-bottom:6px;">Signal</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6;">The emotion that fires. Don't fight it — read it. It's pointing to a hidden flaw.</div>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:32px;margin-bottom:12px;">🔍</div>
+        <div style="font-size:13px;font-weight:500;margin-bottom:6px;">Root flaw</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6;">The real cause — a belief, bias, or illusion running at the unconscious level.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ EMOTIONS ══════════ -->
+<section id="emotions">
+  <div class="container">
+    <p class="sec-eyebrow">The five enemies</p>
+    <h2 class="sec-title">Know your emotional patterns</h2>
+    <p class="sec-desc">Tap any emotion to see its signals and root causes. Self-awareness is the first step to resolution.</p>
+    <div class="emo-grid" id="emo-grid"></div>
+  </div>
+</section>
+
+<!-- ══════════ A/B/C GAME ══════════ -->
+<section id="game">
+  <div class="container">
+    <p class="sec-eyebrow">Performance range</p>
+    <h2 class="sec-title">Where are you trading from?</h2>
+    <p class="sec-desc">Every trader has a performance range. C-game is where your flaws live. Fixing it moves your entire range forward.</p>
+
+    <div class="game-container">
+      <div class="game-meter" id="game-meter-section">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+          <div style="font-family:var(--font-display);font-size:18px;">Today's performance check-in</div>
+          <div style="font-size:12px;color:var(--muted);font-family:var(--font-mono);" id="game-level">Select below</div>
+        </div>
+
+        <div class="form-row" style="margin-bottom:16px;">
+          <label>Emotional clarity right now</label>
+          <input type="range" id="clarity-slider" min="0" max="100" value="50"
+            style="width:100%;accent-color:var(--accent);" oninput="updateGameMeter()">
+        </div>
+        <div class="meter-bar"><div class="meter-fill" id="clarity-fill" style="width:50%;background:var(--accent);"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-family:var(--font-mono);margin-top:4px;">
+          <span>Cloudy / reactive</span><span>Clear / focused</span>
+        </div>
+
+        <div class="form-row" style="margin-top:24px;">
+          <label>Decision-making quality</label>
+          <input type="range" id="decision-slider" min="0" max="100" value="50"
+            style="width:100%;accent-color:var(--accent);" oninput="updateGameMeter()">
+        </div>
+        <div class="meter-bar"><div class="meter-fill" id="decision-fill" style="width:50%;background:var(--blue);"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-family:var(--font-mono);margin-top:4px;">
+          <span>Impulse-driven</span><span>Process-focused</span>
+        </div>
+
+        <div class="form-row" style="margin-top:24px;">
+          <label>Emotional residue from yesterday</label>
+          <input type="range" id="residue-slider" min="0" max="100" value="20"
+            style="width:100%;accent-color:var(--red);" oninput="updateGameMeter()">
+        </div>
+        <div class="meter-bar"><div class="meter-fill" id="residue-fill" style="width:20%;background:var(--red);"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-family:var(--font-mono);margin-top:4px;">
+          <span>Clean slate</span><span>Heavily accumulated</span>
+        </div>
+
+        <div id="game-verdict" style="margin-top:24px;padding:16px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);font-size:14px;line-height:1.7;"></div>
+      </div>
+
+      <div class="game-tiers">
+        <div class="tier tier-a">
+          <div class="tier-label">A</div>
+          <div class="tier-name" style="color:var(--green);">In the zone</div>
+          <div class="tier-desc">Emotions stable & clear. Execution sharp. Mistakes are only learning gaps — not emotional interference.</div>
+        </div>
+        <div class="tier tier-b">
+          <div class="tier-label">B</div>
+          <div class="tier-name" style="color:var(--amber);">Holding on</div>
+          <div class="tier-desc">You catch yourself before C-game mistakes. Present enough to self-correct, but not fully in flow.</div>
+        </div>
+        <div class="tier tier-c">
+          <div class="tier-label">C</div>
+          <div class="tier-name" style="color:var(--red);">Emotional chaos</div>
+          <div class="tier-desc">Hidden flaws fully triggered. You make obvious errors you know are wrong — but can't stop yourself.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ JOURNAL ══════════ -->
+<section id="journal">
+  <div class="container">
+    <p class="sec-eyebrow">Mapping your pattern</p>
+    <h2 class="sec-title">Emotion journal</h2>
+    <p class="sec-desc" style="margin-bottom:32px;">Log emotional events while trading. Over time, patterns emerge — and patterns can be solved.</p>
+
+    <div class="journal-form">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="form-row" style="margin-bottom:0;">
+          <label>Emotion type</label>
+          <select id="emo-select">
+            <option value="">Choose emotion</option>
+            <option value="Greed">Greed</option>
+            <option value="Fear (FOMO)">Fear — FOMO</option>
+            <option value="Fear (losing)">Fear — of losing</option>
+            <option value="Fear (mistakes)">Fear — of mistakes</option>
+            <option value="Tilt / Anger">Tilt / Anger</option>
+            <option value="Overconfidence">Overconfidence</option>
+            <option value="Low confidence">Low confidence</option>
+            <option value="Impatience">Impatience</option>
+            <option value="Boredom">Boredom</option>
+            <option value="Discipline lapse">Discipline lapse</option>
+          </select>
+        </div>
+        <div class="form-row" style="margin-bottom:0;">
+          <label>Trigger event</label>
+          <input type="text" id="trigger-input" placeholder="e.g. stopped out by 2 ticks">
+        </div>
+      </div>
+
+      <div class="form-row" style="margin-top:16px;">
+        <label>Intensity</label>
+        <div class="intensity-row">
+          <button class="int-btn" data-val="1" onclick="selectIntensity(this)">1 — Mild</button>
+          <button class="int-btn" data-val="2" onclick="selectIntensity(this)">2 — Noticeable</button>
+          <button class="int-btn" data-val="3" onclick="selectIntensity(this)">3 — Strong</button>
+          <button class="int-btn" data-val="4" onclick="selectIntensity(this)">4 — Overwhelming</button>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label>What happened? What did you think / do?</label>
+        <textarea id="journal-note" placeholder="Describe the moment — thoughts, actions, decisions made..."></textarea>
+      </div>
+
+      <div class="form-row" style="margin-bottom:0;">
+        <label>What might be the root flaw? (optional)</label>
+        <input type="text" id="root-input" placeholder="e.g. high expectations, fear of going broke, confirmation bias">
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;">
+        <button class="btn-ghost" onclick="clearForm()" style="font-size:13px;padding:9px 18px;">Clear</button>
+        <button class="btn-primary" onclick="addEntry()">Log entry</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom:24px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="font-size:13px;font-weight:500;">Logged entries</div>
+        <div style="font-size:12px;color:var(--muted);font-family:var(--font-mono);" id="entry-count">0 entries</div>
+      </div>
+      <div class="journal-entries" id="entries-list">
+        <div style="text-align:center;padding:40px;color:var(--muted);font-size:13px;">
+          No entries yet. Log your first emotional event above.
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:24px;">
+      <div style="font-size:13px;font-weight:500;margin-bottom:16px;">Weekly streak</div>
+      <div class="streak-grid" id="streak-grid"></div>
+      <div style="font-size:12px;color:var(--muted);margin-top:12px;">Each day you log at least one entry lights up.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ BRAIN TOOLS ══════════ -->
+<section id="tools">
+  <div class="container">
+    <p class="sec-eyebrow">Mental performance</p>
+    <h2 class="sec-title">Brain training tools</h2>
+    <p class="sec-desc">Practical exercises drawn from the book's system to improve clarity, reset accumulated emotion, and build pattern awareness.</p>
+    <div class="tools-grid" id="tools-grid"></div>
+  </div>
+</section>
+
+<!-- ══════════ MODALS ══════════ -->
+
+<!-- Breathing Modal -->
+<div class="modal-overlay" id="modal-breath" onclick="closeModal('modal-breath')">
+  <div class="modal" onclick="event.stopPropagation()" style="position:relative;">
+    <button class="modal-close" onclick="closeModal('modal-breath')">✕</button>
+    <h2>Pre-session reset</h2>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:28px;line-height:1.7;">Box breathing reduces accumulated emotion before you start trading. 4 counts in, hold, out, hold.</p>
+    <div class="breath-container">
+      <div class="breath-circle" id="breath-circle">
+        <div class="breath-ring"></div>
+        <span id="breath-count">4</span>
+      </div>
+      <div class="breath-label" id="breath-phase-label">Ready</div>
+      <div class="breath-phase" id="breath-phase-sub">Press start to begin 4 cycles</div>
+      <button class="breath-btn" id="breath-btn" onclick="toggleBreath()">Start</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reframe Modal -->
+<div class="modal-overlay" id="modal-reframe" onclick="closeModal('modal-reframe')">
+  <div class="modal" onclick="event.stopPropagation()" style="position:relative;">
+    <button class="modal-close" onclick="closeModal('modal-reframe')">✕</button>
+    <h2>Thought reframe</h2>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:24px;line-height:1.7;">Transform reactive thoughts (your C-game inner voice) into grounded, process-focused ones.</p>
+    <div class="form-row">
+      <label>Your reactive thought</label>
+      <textarea id="reactive-thought" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:var(--font-body);font-size:14px;padding:10px 14px;min-height:80px;resize:vertical;outline:none;" placeholder="e.g. I can't believe I missed that move, I always do this..."></textarea>
+    </div>
+    <button class="btn-primary" onclick="generateReframe()" style="width:100%;margin-top:4px;">Reframe it</button>
+    <div class="reframe-result" id="reframe-result"></div>
+  </div>
+</div>
+
+<!-- Inchworm Modal -->
+<div class="modal-overlay" id="modal-inchworm" onclick="closeModal('modal-inchworm')">
+  <div class="modal" onclick="event.stopPropagation()" style="position:relative;">
+    <button class="modal-close" onclick="closeModal('modal-inchworm')">✕</button>
+    <h2>The inchworm concept</h2>
+    <p style="font-size:14px;color:var(--muted);margin:0 0 24px;line-height:1.7;">Your skill range moves as a whole — like an inchworm. Your back end (C-game) must move up before your front end (A-game) can go further.</p>
+    <div id="inchworm-vis" style="margin:20px 0;padding:20px;background:var(--surface);border-radius:var(--r);"></div>
+    <div style="margin-top:16px;">
+      <label style="display:block;font-size:12px;color:var(--muted);margin-bottom:8px;font-family:var(--font-mono);letter-spacing:.08em;text-transform:uppercase;">Drag to simulate: C-game improvement</label>
+      <input type="range" id="inchworm-slider" min="0" max="60" value="0" style="width:100%;accent-color:var(--accent);" oninput="updateInchworm()">
+    </div>
+    <p style="font-size:13px;color:var(--muted);margin-top:16px;line-height:1.7;" id="inchworm-text">Your current C-game is where your performance flaws live. Moving it up automatically elevates the whole range.</p>
+  </div>
+</div>
+
+<!-- Progress Modal -->
+<div class="modal-overlay" id="modal-progress" onclick="closeModal('modal-progress')">
+  <div class="modal" onclick="event.stopPropagation()" style="position:relative;max-width:680px;">
+    <button class="modal-close" onclick="closeModal('modal-progress')">✕</button>
+    <h2>Your progress</h2>
+    <div class="progress-section">
+      <div class="progress-cards" id="progress-cards"></div>
+      <div class="chart-area">
+        <div style="font-size:13px;font-weight:500;margin-bottom:4px;">Emotional intensity over time</div>
+        <div style="font-size:12px;color:var(--muted);">Lower average = better regulation</div>
+        <div class="bar-chart" id="bar-chart"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>Based on <em>The Mental Game of Trading</em> by Jared Tendler · Built as a companion practice tool</p>
+</footer>
+
+<script src="app-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ── DATA ──
+const EMOTIONS = [
+  {
+    icon: '💰', label: 'Greed', color: 'amber',
+    short: 'Forcing bad setups, chasing, moving profit targets to make a killing.',
+    signals: ['Forcing mediocre setups', 'Moving profit target during trade', 'Over-sizing positions', 'Chasing price action'],
+    root: 'Often rooted in unrealistic expectations of how much you should make, or a belief that you must maximize every opportunity or you\'ve failed.',
+    resolution: 'Correct the underlying expectation. Accept that not every moment offers an edge. Quality over quantity is the actual path to more money.',
+    tags: ['tag-amber','tag-amber','tag-amber']
+  },
+  {
+    icon: '😨', label: 'Fear — FOMO', color: 'blue',
+    short: 'Chasing the market after missing a move. Entering late, oversized, or without a signal.',
+    signals: ['Entering after the move has happened', 'Ignoring setup criteria when excited', 'Increasing size out of urgency', 'Checking PnL of others constantly'],
+    root: 'A belief that missing a trade means failure. Tied to a scarcity mindset — as if opportunities are rare and each one missed is permanent loss.',
+    resolution: 'Internalize that the market offers endless opportunities. One missed move doesn\'t define you. Process matters more than any single trade.',
+    tags: ['tag-blue','tag-blue']
+  },
+  {
+    icon: '😰', label: 'Fear — of losing', color: 'blue',
+    short: 'Exiting trades early, moving stops to breakeven prematurely, avoiding valid setups.',
+    signals: ['Exiting before target', 'Moving stop to B/E too early', 'Skipping valid setups', 'Holding losers longer to avoid booking'],
+    root: 'Often from a past experience of large losses — even years ago — that created a deep belief that losing leads to catastrophic outcomes.',
+    resolution: 'Reprocess the belief. Losses are a cost of doing business, not evidence of failure. Define risk clearly and accept it before entry.',
+    tags: ['tag-blue','tag-red']
+  },
+  {
+    icon: '😬', label: 'Fear — of mistakes', color: 'purple',
+    short: 'Freezing at the entry, second-guessing valid setups, inability to pull the trigger.',
+    signals: ['Hesitating on clear entries', 'Talking yourself out of good trades', 'Excessive self-criticism after errors', '"Don\'t mess this up" thoughts before entry'],
+    root: 'Perfectionism — a belief that mistakes are unacceptable. Often combined with high expectations that allow no room for normal human error.',
+    resolution: 'Reframe mistakes as data, not failures. Even A-game traders make learning mistakes. Execution quality matters more than being right every time.',
+    tags: ['tag-purple','tag-purple']
+  },
+  {
+    icon: '🔥', label: 'Tilt / Anger', color: 'red',
+    short: 'Revenge trading, hating losses, overreacting to bad fills or perceived injustice.',
+    signals: ['Revenge trading after a loss', 'Overtrading to "make back" losses', 'Blaming the market, broker, or others', 'Making obvious errors right after a mistake'],
+    root: 'Hatred of losing, injustice tilt, or entitlement — a belief that good execution should always produce wins. Unmet expectations create anger.',
+    resolution: 'Accept that randomness is part of the game. Good process does not guarantee good outcomes in the short term. Separate execution from results.',
+    tags: ['tag-red','tag-red','tag-amber']
+  },
+  {
+    icon: '🎯', label: 'Confidence', color: 'green',
+    short: 'Swinging between overconfidence and doubt. Perfectionism, desperation, hope and wishing.',
+    signals: ['Overconfident: ignoring risk, oversizing', 'Lacking: avoiding trades, needing confirmation', 'Desperate trades to prove you can do it', 'Perfectionism: devastated by normal mistakes'],
+    root: 'Unstable confidence is tied to results rather than process. A losing streak collapses it; a winning streak inflates it — neither is grounded.',
+    resolution: 'Build stable confidence from process mastery, not outcomes. Document what good execution looks like and measure yourself against that.',
+    tags: ['tag-green','tag-red','tag-amber']
+  },
+  {
+    icon: '⏱', label: 'Impatience', color: 'gold',
+    short: 'Forcing trades out of boredom or the urge to "do something". Entering early or without confirmation.',
+    signals: ['Entering before setup completes', 'Boredom forcing low-quality trades', 'Constantly watching positions', 'Exiting good trades early to end the wait'],
+    root: 'A disconnect between your internal pace and the market\'s pace. Expecting the market to move on your timeline.',
+    resolution: 'Accept that waiting IS the work. Build a pre-trade checklist that forces you to verify criteria before entry.',
+    tags: ['tag-gold','tag-gold']
+  },
+  {
+    icon: '🧠', label: 'Discipline', color: 'purple',
+    short: 'Skipping routines, being results-oriented, laziness, procrastination, distractibility.',
+    signals: ['Skipping pre-market preparation', 'Abandoning your process after wins', 'Checking social media during trading hours', 'Procrastinating on trade review'],
+    root: 'Discipline problems often mask emotional avoidance — the behaviors that would expose your weaknesses get postponed because the emotions around them are uncomfortable.',
+    resolution: 'Build systems, not willpower. Structure your environment to reduce friction for good habits and increase friction for bad ones.',
+    tags: ['tag-purple','tag-blue']
+  }
+];
+
+const STEPS = [
+  {
+    num: '1', title: 'Map your pattern',
+    desc: 'Identify the macro view of your emotional volatility and the micro signals that show up in real time.',
+    detail: 'Track what emotions, thoughts, and actions arise before, during, and after every mistake. You can\'t stop what you can\'t see. Patterns repeat — mapping them lets you build an internal GPS that alerts you when you\'ve taken a wrong turn before it becomes a disaster.'
+  },
+  {
+    num: '2', title: 'Find the root',
+    desc: 'Dig beneath emotions to uncover the hidden flaws, biases, and illusions driving them.',
+    detail: 'The trigger isn\'t the problem — it\'s the detonator. The underlying flaw is the bomb. Use emotions as forensic clues. Trace them backward: what belief, expectation, or illusion is generating this reaction? Common roots: high expectations, confirmation bias, fear of going broke, entitlement.'
+  },
+  {
+    num: '3', title: 'Correct the problem',
+    desc: 'Apply the correction consistently in real time until the flaw is permanently resolved.',
+    detail: 'Resolution means the emotion stops triggering entirely. You don\'t manage it — it disappears. Apply your correction at the moment of trigger, not after. Build a real-time strategy for catching yourself mid-reaction and redirecting to process. Track progress — it\'s nonlinear and things may get worse before they get better.'
+  }
+];
+
+const TOOLS = [
+  { icon: '🫁', title: 'Pre-session reset', desc: 'Box breathing to reduce accumulated emotion before trading. 4 counts in, hold, out, hold — 4 cycles.', badge: '5 minutes', action: "openModal('modal-breath')" },
+  { icon: '🔄', title: 'Thought reframe', desc: 'Transform reactive C-game thoughts into grounded, process-focused ones. Works in real time.', badge: 'Cognitive', action: "openModal('modal-reframe')" },
+  { icon: '📏', title: 'The inchworm model', desc: 'Visualize how your A, B, and C game move together. C-game improvement is the key lever.', badge: 'Visualization', action: "openModal('modal-inchworm')" },
+  { icon: '📈', title: 'Pattern progress', desc: "See your emotion patterns over time — frequency, intensity, and which flaws you've been working on.", badge: 'Analytics', action: "buildProgress();openModal('modal-progress')" },
+  { icon: '🎯', title: 'The 5-minute review', desc: 'After a trading session, quickly answer 3 questions to map your pattern without overthinking it.', badge: 'Post-session', action: "navTo('journal')" },
+  { icon: '⚖️', title: 'Emotion vs execution', desc: "Track whether today's mistakes were technical (learning gaps) or emotional (flaw-driven). Only one needs this system.", badge: 'Diagnostic', action: "navTo('game')" }
+];
+
+// ── REFRAME LIBRARY ──
+const REFRAMES = [
+  { trigger: ['miss','missed','missing'], reframe: 'I missed a setup. The market offers endless opportunities. Missing one doesn\'t define my edge — my process over hundreds of trades does. Next valid setup, I execute.' },
+  { trigger: ['stupid','idiot','dumb'], reframe: 'I made a mistake. Mistakes are data, not evidence of failure. Every mistake points to a specific flaw I can identify and correct. I\'m gathering information, not confirming a story about myself.' },
+  { trigger: ['always','never','every time'], reframe: 'I\'m noticing a pattern, which means I can study it. "Always" and "never" are emotional exaggerations — they signal the emotion is running hot, not that the belief is accurate. What specifically happened this time?' },
+  { trigger: ['unfair','rigged','manipulated'], reframe: 'The market doesn\'t owe me anything. Frustration about fairness is injustice tilt — it means my expectations collided with reality. I can only control my execution, not the outcome of any individual trade.' },
+  { trigger: ['lose','loss','losing'], reframe: 'Losses are a cost of doing business with an edge. No profitable strategy wins every trade. My job is to execute my process — the math takes care of the rest over time.' },
+  { trigger: ['scared','afraid','fear','anxious'], reframe: 'Fear is a signal. Something I believe is being threatened — my account, my identity as a trader, my confidence. What specifically am I afraid of? That fear is pointing to a real flaw I can work on.' },
+  { trigger: ['make back','revenge','recover'], reframe: 'The urge to make it back quickly is tilt. Each trade should be evaluated on its own merits, not on how much I need to recover. I trade my edge — not my emotions.' },
+  { trigger: ['give up','quit','done'], reframe: 'This feeling of wanting to quit is accumulated emotion signaling I need a reset, not a career change. Step away from the screen. Let the emotion digest. Come back when I can evaluate clearly.' }
+];
+
+// ── STATE ──
+var entries = [];
+var supabase = null, currentUser = null;
+try {
+  if (window.MG_CONFIG && window.MG_CONFIG.url && window.MG_CONFIG.anonKey && !window.MG_CONFIG.url.includes('YOUR_'))
+    supabase = window.supabase.createClient(window.MG_CONFIG.url, window.MG_CONFIG.anonKey);
+} catch(e) {}
+var intensity = null;
+var breathActive = false;
+var breathTimer = null;
+
+// ── INIT ──
+function init() {
+  renderSteps();
+  renderEmotions();
+  renderTools();
+  renderStreak();
+  renderEntries();
+  updateHomeStat();
+  updateGameMeter();
+  buildInchworm();
+  if (!supabase) document.getElementById('auth-status').textContent = 'Connect Supabase first: follow SETUP.md and add your project URL and anon key to app-config.js.';
+  else supabase.auth.getSession().then(({data}) => { if(data.session) onSignedIn(data.session.user); });
+  if (supabase) supabase.auth.onAuthStateChange((_event, session) => {
+    if(session) onSignedIn(session.user);
+    else { currentUser=null; document.getElementById('auth-screen').style.display='flex'; document.getElementById('account-controls').style.display='none'; }
+  });
+}
+
+async function requestSignIn(ev) {
+  ev.preventDefault();
+  const status=document.getElementById('auth-status');
+  if(!supabase){status.textContent='Backend is not configured yet. See SETUP.md.';return;}
+  const email=document.getElementById('auth-email').value.trim();
+  status.textContent='Sending your secure sign-in link…';
+  const {error}=await supabase.auth.signInWithOtp({email,options:{emailRedirectTo:location.href.split('#')[0]}});
+  status.textContent=error ? error.message : 'Check your inbox for your sign-in link.';
+}
+async function onSignedIn(user) {
+  if(!supabase || !user) return;
+  currentUser=user;
+  document.getElementById('auth-screen').style.display='none';
+  document.getElementById('account-controls').style.display='flex';
+  document.getElementById('account-email').textContent=user.email||'';
+  const {data,error}=await supabase.from('journal_entries').select('*').order('created_at',{ascending:false});
+  if(error){alert('Could not load your journal: '+error.message);return;}
+  entries=data.map(row=>({id:row.id,emotion:row.emotion,trigger:row.trigger_text||'',note:row.note,root:row.root_flaw||'',intensity:row.intensity,date:row.created_at}));
+  localStorage.setItem('mgentries:'+user.id,JSON.stringify(entries));
+  renderEntries();renderStreak();updateHomeStat();
+}
+async function signOut(){if(supabase) await supabase.auth.signOut();}
+
+function renderSteps() {
+  const g = document.getElementById('steps-grid');
+  g.innerHTML = STEPS.map((s,i) => `
+    <div class="step-card ${i===0?'active-step':''}" onclick="toggleStep(this)">
+      <div class="step-number">${s.num}</div>
+      <div class="step-content">
+        <h3>${s.title}</h3>
+        <p>${s.desc}</p>
+        <div class="step-detail">${s.detail}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleStep(el) {
+  document.querySelectorAll('.step-card').forEach(c => c.classList.remove('active-step'));
+  el.classList.add('active-step');
+}
+
+function renderEmotions() {
+  const g = document.getElementById('emo-grid');
+  const colorMap = { amber:'tag-amber', blue:'tag-blue', red:'tag-red', green:'tag-green', purple:'tag-purple', gold:'tag-gold' };
+  g.innerHTML = EMOTIONS.map((e,i) => `
+    <div class="emo-card" onclick="toggleEmo(this)">
+      <div class="emo-icon">${e.icon}</div>
+      <h3>${e.label}</h3>
+      <div class="emo-short">${e.short}</div>
+      <div class="emo-long">
+        <div style="margin-bottom:14px;">
+          <div style="font-size:11px;color:var(--muted);font-family:var(--font-mono);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">Common signals</div>
+          ${e.signals.map(s => `<div style="font-size:12px;color:var(--muted);padding:3px 0;border-bottom:1px solid var(--border);">• ${s}</div>`).join('')}
+        </div>
+        <div style="margin-bottom:12px;">
+          <div style="font-size:11px;color:var(--muted);font-family:var(--font-mono);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;">Root flaw</div>
+          <div style="font-size:13px;line-height:1.65;">${e.root}</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--muted);font-family:var(--font-mono);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;">Path to resolution</div>
+          <div style="font-size:13px;line-height:1.65;color:var(--green);">${e.resolution}</div>
+        </div>
+        ${e.tags.map(t => `<span class="emo-tag ${t}">${t.replace('tag-','')}</span>`).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleEmo(el) {
+  const wasOpen = el.classList.contains('expanded');
+  document.querySelectorAll('.emo-card').forEach(c => c.classList.remove('expanded'));
+  if (!wasOpen) el.classList.add('expanded');
+}
+
+function renderTools() {
+  var g = document.getElementById('tools-grid');
+  var html = '';
+  for (var i = 0; i < TOOLS.length; i++) {
+    var t = TOOLS[i];
+    var safeAction = t.action.replace(/"/g, "'");
+    html += '<div class="tool-card" onclick="' + safeAction + '">';
+    html += '<div class="tool-icon">' + t.icon + '</div>';
+    html += '<h3>' + t.title + '</h3>';
+    html += '<p>' + t.desc + '</p>';
+    html += '<span class="tool-badge">' + t.badge + '</span>';
+    html += '</div>';
+  }
+  g.innerHTML = html;
+}
+
+// ── JOURNAL ──
+function selectIntensity(btn) {
+  document.querySelectorAll('.int-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  intensity = parseInt(btn.dataset.val);
+}
+
+function addEntry() {
+  const emo = document.getElementById('emo-select').value;
+  const trigger = document.getElementById('trigger-input').value.trim();
+  const note = document.getElementById('journal-note').value.trim();
+  const root = document.getElementById('root-input').value.trim();
+  if (!emo || !note) { alert('Please select an emotion and write a note.'); return; }
+  const entry = {
+    id: Date.now(),
+    emotion: emo,
+    trigger,
+    note,
+    root,
+    intensity: intensity || 2,
+    date: new Date().toISOString()
+  };
+  entries.unshift(entry);
+  try { localStorage.setItem('mgentries:'+(currentUser?.id||'local'), JSON.stringify(entries)); } catch(e) {}
+  if(currentUser && supabase) supabase.from('journal_entries').insert({user_id:currentUser.id,emotion:entry.emotion,trigger_text:entry.trigger,note:entry.note,root_flaw:entry.root,intensity:entry.intensity,created_at:entry.date}).then(({error})=>{if(error) alert('Entry is shown on this device but could not sync: '+error.message);});
+  clearForm();
+  renderEntries();
+  renderStreak();
+  updateHomeStat();
+}
+
+function clearForm() {
+  document.getElementById('emo-select').value = '';
+  document.getElementById('trigger-input').value = '';
+  document.getElementById('journal-note').value = '';
+  document.getElementById('root-input').value = '';
+  document.querySelectorAll('.int-btn').forEach(b => b.classList.remove('selected'));
+  intensity = null;
+}
+
+function renderEntries() {
+  const list = document.getElementById('entries-list');
+  const cnt = document.getElementById('entry-count');
+  cnt.textContent = `${entries.length} entr${entries.length===1?'y':'ies'}`;
+  if (!entries.length) {
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px;">No entries yet. Log your first emotional event above.</div>';
+    return;
+  }
+  const intColors = ['','rgba(92,196,154,0.2)','rgba(200,169,110,0.2)','rgba(224,144,80,0.2)','rgba(224,92,92,0.2)'];
+  const intLabels = ['','Mild','Noticeable','Strong','Overwhelming'];
+  const esc = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  list.innerHTML = entries.slice(0,20).map(e => {
+    const d = new Date(e.date);
+    const ds = d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}) + ' · ' + d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    return `<div class="entry-card">
+      <div class="entry-header">
+      <span class="entry-emotion">${esc(e.emotion)}</span>
+        <span class="entry-time">${ds}</span>
+      </div>
+      ${e.trigger ? `<div style="font-size:12px;color:var(--muted);margin-bottom:6px;font-family:var(--font-mono);">Trigger: ${esc(e.trigger)}</div>` : ''}
+      <div class="entry-note">${esc(e.note)}</div>
+      ${e.root ? `<div style="font-size:12px;color:var(--accent);margin-top:6px;">Root: ${esc(e.root)}</div>` : ''}
+      <span class="entry-intensity" style="background:${intColors[e.intensity]};color:var(--text);">${intLabels[e.intensity]}</span>
+    </div>`;
+  }).join('');
+}
+
+function renderStreak() {
+  const g = document.getElementById('streak-grid');
+  const today = new Date();
+  const days = [];
+  for (let i = 27; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    days.push(d);
+  }
+  const logged = new Set(entries.map(e => new Date(e.date).toDateString()));
+  g.innerHTML = days.map(d => {
+    const lbl = d.getDate().toString().padStart(2,'0');
+    const has = logged.has(d.toDateString());
+    return `<div class="streak-day ${has?'logged':''}" title="${d.toDateString()}">${lbl}</div>`;
+  }).join('');
+}
+
+function updateHomeStat() {
+  document.getElementById('entry-num').textContent = entries.length;
+  // streak
+  let streak = 0;
+  const today = new Date().toDateString();
+  const logged = new Set(entries.map(e => new Date(e.date).toDateString()));
+  const d = new Date();
+  while (logged.has(d.toDateString())) { streak++; d.setDate(d.getDate()-1); }
+  document.getElementById('streak-num').textContent = streak;
+}
+
+// ── GAME METER ──
+function updateGameMeter() {
+  const c = parseInt(document.getElementById('clarity-slider').value);
+  const d2 = parseInt(document.getElementById('decision-slider').value);
+  const r = parseInt(document.getElementById('residue-slider').value);
+  document.getElementById('clarity-fill').style.width = c + '%';
+  document.getElementById('decision-fill').style.width = d2 + '%';
+  document.getElementById('residue-fill').style.width = r + '%';
+  const score = Math.round((c + d2) / 2 - r * 0.3);
+  let verdict, level, col;
+  if (score >= 65) { level = 'A-game territory'; col = 'var(--green)'; verdict = 'Your emotional state looks clear. This is when your edge is most accessible. Execute your process with full confidence — mistakes now are learning gaps, not emotional flaws.'; }
+  else if (score >= 35) { level = 'B-game territory'; col = 'var(--amber)'; verdict = 'You\'re functional but not in full flow. Catch yourself before impulse decisions. Use your pre-trade checklist. Reduce size if accumulated emotion is high (residue slider) to protect your capital while you regulate.'; }
+  else { level = 'C-game risk'; col = 'var(--red)'; verdict = 'Significant accumulated emotion or low clarity detected. Consider a reset — box breathing, a short walk — before trading. If you must trade, size down substantially. Today\'s goal is protecting capital, not making it.'; }
+  document.getElementById('game-level').textContent = level;
+  document.getElementById('game-level').style.color = col;
+  document.getElementById('game-verdict').innerHTML = `<span style="font-weight:500;color:${col};">${level}</span><br><span style="color:var(--muted);font-size:13px;">${verdict}</span>`;
+}
+
+// ── BREATHING ──
+let breathPhase = 0, breathCount = 4, breathCycle = 0;
+const PHASES = [
+  { label: 'Breathe in', sub: 'Inhale slowly through your nose', dur: 4 },
+  { label: 'Hold', sub: 'Keep it in', dur: 4 },
+  { label: 'Breathe out', sub: 'Exhale slowly through your mouth', dur: 4 },
+  { label: 'Hold', sub: 'Empty and still', dur: 4 }
+];
+
+function toggleBreath() {
+  if (breathActive) {
+    breathActive = false;
+    clearTimeout(breathTimer);
+    document.getElementById('breath-btn').textContent = 'Start';
+    document.getElementById('breath-phase-label').textContent = 'Ready';
+    document.getElementById('breath-phase-sub').textContent = 'Press start to begin 4 cycles';
+    document.getElementById('breath-circle').style.transform = 'scale(1)';
+    breathPhase = 0; breathCount = 4; breathCycle = 0;
+  } else {
+    breathActive = true;
+    breathCycle = 0; breathPhase = 0; breathCount = PHASES[0].dur;
+    document.getElementById('breath-btn').textContent = 'Stop';
+    runBreath();
+  }
+}
+
+function runBreath() {
+  if (!breathActive) return;
+  const p = PHASES[breathPhase];
+  document.getElementById('breath-phase-label').textContent = p.label;
+  document.getElementById('breath-phase-sub').textContent = p.sub + (breathPhase===3 ? ` — cycle ${breathCycle+1}/4` : '');
+  document.getElementById('breath-circle').style.transform = breathPhase===0 ? 'scale(1.25)' : breathPhase===2 ? 'scale(1)' : '';
+  let cnt = p.dur;
+  document.getElementById('breath-count').textContent = cnt;
+  const tick = () => {
+    if (!breathActive) return;
+    cnt--;
+    document.getElementById('breath-count').textContent = cnt;
+    if (cnt <= 0) {
+      breathPhase = (breathPhase+1) % 4;
+      if (breathPhase === 0) {
+        breathCycle++;
+        if (breathCycle >= 4) { toggleBreath(); document.getElementById('breath-phase-label').textContent = 'Complete ✓'; document.getElementById('breath-phase-sub').textContent = 'You\'re reset. Trade with clarity.'; return; }
+      }
+      runBreath();
+    } else {
+      breathTimer = setTimeout(tick, 1000);
+    }
+  };
+  breathTimer = setTimeout(tick, 1000);
+}
+
+// ── REFRAME ──
+function generateReframe() {
+  const thought = document.getElementById('reactive-thought').value.toLowerCase();
+  const res = document.getElementById('reframe-result');
+  let found = null;
+  for (const r of REFRAMES) {
+    if (r.trigger.some(t => thought.includes(t))) { found = r; break; }
+  }
+  if (!found) {
+    found = { reframe: 'This thought is a signal, not a truth. Ask: what specifically am I afraid of or angry about? What belief is this emotion protecting? Trace it backward — from the emotion to the trigger to the underlying flaw. That flaw is what you\'re really working on.' };
+  }
+  res.innerHTML = `
+    <div style="font-size:11px;color:var(--accent);font-family:var(--font-mono);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;">Reframed</div>
+    <div style="font-size:14px;line-height:1.75;color:var(--text);">${found.reframe}</div>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(200,169,110,0.2);font-size:12px;color:var(--muted);">Save this as a sticky note near your trading station. Read it the moment you notice the reactive thought starting.</div>
+  `;
+  res.classList.add('show');
+}
+
+// ── INCHWORM ──
+function buildInchworm() {
+  updateInchworm();
+}
+
+function updateInchworm() {
+  const v = parseInt(document.getElementById('inchworm-slider')?.value || 0);
+  const vis = document.getElementById('inchworm-vis');
+  if (!vis) return;
+  const cStart = 10 + v * 0.5;
+  const bStart = 35 + v * 0.4;
+  const aStart = 65 + v * 0.3;
+  vis.innerHTML = `
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px;font-family:var(--font-mono);">Performance range (0–100)</div>
+    <div style="position:relative;height:40px;background:var(--surface);border-radius:8px;overflow:hidden;">
+      <div style="position:absolute;top:0;left:${cStart}%;width:${bStart-cStart}%;height:100%;background:rgba(224,92,92,0.3);transition:all .5s;"></div>
+      <div style="position:absolute;top:0;left:${bStart}%;width:${aStart-bStart}%;height:100%;background:rgba(224,144,80,0.3);transition:all .5s;"></div>
+      <div style="position:absolute;top:0;left:${aStart}%;width:${100-aStart}%;height:100%;background:rgba(92,196,154,0.3);transition:all .5s;"></div>
+      <div style="position:absolute;top:50%;left:${cStart}%;transform:translate(-50%,-50%);font-size:11px;color:var(--red);font-weight:500;font-family:var(--font-mono);transition:left .5s;">C</div>
+      <div style="position:absolute;top:50%;left:${bStart+((aStart-bStart)/2)}%;transform:translate(-50%,-50%);font-size:11px;color:var(--amber);font-weight:500;font-family:var(--font-mono);transition:left .5s;">B</div>
+      <div style="position:absolute;top:50%;left:${aStart+((100-aStart)/2)}%;transform:translate(-50%,-50%);font-size:11px;color:var(--green);font-weight:500;font-family:var(--font-mono);transition:left .5s;">A</div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:6px;font-family:var(--font-mono);">
+      <span>Worst</span><span>Best</span>
+    </div>
+  `;
+  const t = document.getElementById('inchworm-text');
+  if (t) {
+    if (v < 20) t.textContent = 'Your current C-game is where your performance flaws live. Moving it up automatically elevates the whole range.';
+    else if (v < 45) t.textContent = 'Good progress on C-game. Notice how B and A game also shift right — the whole inchworm moves together.';
+    else t.textContent = 'Significant C-game improvement. Your worst day now looks like your average day used to. This is what resolution feels like.';
+  }
+}
+
+// ── PROGRESS ──
+function buildProgress() {
+  const cards = document.getElementById('progress-cards');
+  const emoCount = {};
+  let totalIntensity = 0;
+  entries.forEach(e => {
+    const k = e.emotion.split(' ')[0];
+    emoCount[k] = (emoCount[k]||0)+1;
+    totalIntensity += e.intensity||2;
+  });
+  const topEmo = Object.entries(emoCount).sort((a,b)=>b[1]-a[1])[0];
+  const avgInt = entries.length ? (totalIntensity/entries.length).toFixed(1) : '—';
+  cards.innerHTML = `
+    <div class="p-card"><div class="p-card-num" style="color:var(--accent);">${entries.length}</div><div class="p-card-label">total entries</div></div>
+    <div class="p-card"><div class="p-card-num" style="color:var(--blue);">${avgInt}</div><div class="p-card-label">avg intensity</div></div>
+    <div class="p-card"><div class="p-card-num" style="color:var(--green);">${topEmo?topEmo[0]:'—'}</div><div class="p-card-label">most logged</div></div>
+  `;
+  // Bar chart by last 7 days
+  const chart = document.getElementById('bar-chart');
+  const days = [];
+  for (let i=6;i>=0;i--) { const d=new Date(); d.setDate(d.getDate()-i); days.push(d); }
+  const dayData = days.map(d => {
+    const ds = d.toDateString();
+    const dayEntries = entries.filter(e=>new Date(e.date).toDateString()===ds);
+    const avg = dayEntries.length ? dayEntries.reduce((s,e)=>s+(e.intensity||2),0)/dayEntries.length : 0;
+    return { label: d.toLocaleDateString('en-GB',{weekday:'short'}), val: avg, count: dayEntries.length };
+  });
+  const max = Math.max(...dayData.map(d=>d.val),1);
+  const intColors = ['','var(--green)','var(--accent)','var(--amber)','var(--red)'];
+  chart.innerHTML = dayData.map(d => {
+    const h = d.val ? Math.round((d.val/max)*90) + '%' : '4px';
+    const col = d.val ? intColors[Math.round(d.val)] || 'var(--accent)' : 'var(--surface)';
+    return `<div class="bar-wrap">
+      <div class="bar" style="height:${h};background:${col};" title="${d.count} entr${d.count===1?'y':'ies'}"></div>
+      <div class="bar-lbl">${d.label}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── MODAL ──
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  if (id==='modal-breath' && breathActive) toggleBreath();
+}
+
+// ── NAVIGATION ──
+function navTo(id) {
+  var btn = document.getElementById('nav-' + id);
+  showSection(id, btn);
+}
+
+function showSection(id, btn) {
+  document.querySelectorAll('section').forEach(function(s) { s.classList.remove('active'); });
+  document.querySelectorAll('.nav-links button').forEach(function(b) { b.classList.remove('active'); });
+  var sec = document.getElementById(id);
+  if (sec) sec.classList.add('active');
+  if (btn) btn.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('./sw.js').catch(()=>{});
+init();
+</script>
+</body>
+</html>
