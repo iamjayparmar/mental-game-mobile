@@ -863,10 +863,10 @@ const REFRAMES = [
 
 // ── STATE ──
 var entries = [];
-var supabase = null, currentUser = null;
+var supabaseClient = null, currentUser = null;
 try {
   if (window.MG_CONFIG && window.MG_CONFIG.url && window.MG_CONFIG.anonKey && !window.MG_CONFIG.url.includes('YOUR_'))
-    supabase = window.supabase.createClient(window.MG_CONFIG.url, window.MG_CONFIG.anonKey);
+    supabaseClient = window.supabase.createClient(window.MG_CONFIG.url, window.MG_CONFIG.anonKey);
 } catch(e) {}
 var intensity = null;
 var breathActive = false;
@@ -882,9 +882,9 @@ function init() {
   updateHomeStat();
   updateGameMeter();
   buildInchworm();
-  if (!supabase) document.getElementById('auth-status').textContent = 'Connect Supabase first: follow SETUP.md and add your project URL and anon key to app-config.js.';
-  else supabase.auth.getSession().then(({data}) => { if(data.session) onSignedIn(data.session.user); });
-  if (supabase) supabase.auth.onAuthStateChange((_event, session) => {
+  if (!supabaseClient) document.getElementById('auth-status').textContent = 'Connect Supabase first: follow SETUP.md and add your project URL and anon key to app-config.js.';
+  else supabaseClient.auth.getSession().then(({data}) => { if(data.session) onSignedIn(data.session.user); });
+  if (supabaseClient) supabaseClient.auth.onAuthStateChange((_event, session) => {
     if(session) onSignedIn(session.user);
     else { currentUser=null; document.getElementById('auth-screen').style.display='flex'; document.getElementById('account-controls').style.display='none'; }
   });
@@ -893,25 +893,25 @@ function init() {
 async function requestSignIn(ev) {
   ev.preventDefault();
   const status=document.getElementById('auth-status');
-  if(!supabase){status.textContent='Backend is not configured yet. See SETUP.md.';return;}
+  if(!supabaseClient){status.textContent='Backend is not configured yet. See SETUP.md.';return;}
   const email=document.getElementById('auth-email').value.trim();
   status.textContent='Sending your secure sign-in link…';
-  const {error}=await supabase.auth.signInWithOtp({email,options:{emailRedirectTo:location.href.split('#')[0]}});
+  const {error}=await supabaseClient.auth.signInWithOtp({email,options:{emailRedirectTo:location.href.split('#')[0]}});
   status.textContent=error ? error.message : 'Check your inbox for your sign-in link.';
 }
 async function onSignedIn(user) {
-  if(!supabase || !user) return;
+  if(!supabaseClient || !user) return;
   currentUser=user;
   document.getElementById('auth-screen').style.display='none';
   document.getElementById('account-controls').style.display='flex';
   document.getElementById('account-email').textContent=user.email||'';
-  const {data,error}=await supabase.from('journal_entries').select('*').order('created_at',{ascending:false});
+  const {data,error}=await supabaseClient.from('journal_entries').select('*').order('created_at',{ascending:false});
   if(error){alert('Could not load your journal: '+error.message);return;}
   entries=data.map(row=>({id:row.id,emotion:row.emotion,trigger:row.trigger_text||'',note:row.note,root:row.root_flaw||'',intensity:row.intensity,date:row.created_at}));
   localStorage.setItem('mgentries:'+user.id,JSON.stringify(entries));
   renderEntries();renderStreak();updateHomeStat();
 }
-async function signOut(){if(supabase) await supabase.auth.signOut();}
+async function signOut(){if(supabaseClient) await supabaseClient.auth.signOut();}
 
 function renderSteps() {
   const g = document.getElementById('steps-grid');
@@ -1005,7 +1005,7 @@ function addEntry() {
   };
   entries.unshift(entry);
   try { localStorage.setItem('mgentries:'+(currentUser?.id||'local'), JSON.stringify(entries)); } catch(e) {}
-  if(currentUser && supabase) supabase.from('journal_entries').insert({user_id:currentUser.id,emotion:entry.emotion,trigger_text:entry.trigger,note:entry.note,root_flaw:entry.root,intensity:entry.intensity,created_at:entry.date}).then(({error})=>{if(error) alert('Entry is shown on this device but could not sync: '+error.message);});
+  if(currentUser && supabaseClient) supabaseClient.from('journal_entries').insert({user_id:currentUser.id,emotion:entry.emotion,trigger_text:entry.trigger,note:entry.note,root_flaw:entry.root,intensity:entry.intensity,created_at:entry.date}).then(({error})=>{if(error) alert('Entry is shown on this device but could not sync: '+error.message);});
   clearForm();
   renderEntries();
   renderStreak();
