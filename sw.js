@@ -1,4 +1,4 @@
-const CACHE = 'mental-game-shell-v1';
+const CACHE = 'mental-game-shell-v2';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './app-config.js', './icon.svg'];
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL))));
 self.addEventListener('activate', event => event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))));
