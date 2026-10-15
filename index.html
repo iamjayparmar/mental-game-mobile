@@ -896,7 +896,7 @@ async function requestSignIn(ev) {
   if(!supabaseClient){status.textContent='Backend is not configured yet. See SETUP.md.';return;}
   const email=document.getElementById('auth-email').value.trim();
   status.textContent='Sending your secure sign-in link…';
-  const {error}=await supabaseClient.auth.signInWithOtp({email,options:{emailRedirectTo:location.href.split('#')[0]}});
+  const {error}=await supabaseClient.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin + location.pathname}});
   status.textContent=error ? error.message : 'Check your inbox for your sign-in link.';
 }
 async function onSignedIn(user) {
